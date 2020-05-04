@@ -23,21 +23,24 @@ n_actions = env.action_space.n
 r = np.zeros(n_states) # the r vector is zero everywhere except for the goal state (last state)
 r[-1] = 1.
 
-gamma = 0.8
 
-
-""" This is a helper function that returns the transition probability matrix P for a policy """
 def trans_matrix_for_policy(policy):
+    ''' Returns the transition probability matrix P for a policy
+    Returns:
+        P(s,s'): Transition matrix P_{i,j} = p(s'=j|s=i)
+               = p(s'|s) = Sum_a pi(a|s)*p(s'|s,a)
+    '''
     transitions = np.zeros((n_states, n_states))
     for s in range(n_states):
-        probs = env.P[s][policy[s]]
-        for el in probs:
+        probs = env.P[s][policy[s]]         # env.P(s,a) = env.P(s,pi(s)) -> [ p(s'|s,a), s', r(s',s,a)=E[r|s',a,s], isterminal ]
+        for el in probs:                    # P(s,s') = p(s'|s) = Sum_a p(s'|s,a)
             transitions[s, el[1]] += el[0]
     return transitions
 
 
-""" This is a helper function that returns terminal states """
 def terminals():
+    """ This is a helper function that returns terminal states 
+    """
     terms = []
     for s in range(n_states):
         # terminal is when we end with probability 1 in terminal:
@@ -46,21 +49,40 @@ def terminals():
     return terms
 
 
-def value_policy(policy):
+def value_policy(policy, gamma=0.8):
+    '''
+    V(s) = R(s) + P(s,s') @ gamma*V(s')   ->  V = (I - gamma * P)^-1 @ R
+         = r(s) + Sum_{s'}  p(s'|s) * gamma * V(s')
+
+    where  P(s,s') = p(s'|s) = Sum_a pi(a|s)*p(s'|s,a)
+    '''
     P = trans_matrix_for_policy(policy)
-    # TODO: calculate and return v
-    # (P, r and gamma already given)
-    return None
+    # calculate and return v. (P, r and gamma already given)
+    I = np.eye( P.shape[0] )
+    V_pi = np.linalg.inv(I - gamma * P) @ r
+    return V_pi
 
 
 def bruteforce_policies():
-    terms = terminals()
-    optimalpolicies = []
+    from itertools import product
 
-    policy = np.zeros(n_states, dtype=np.int)  # in the discrete case a policy is just an array with action = policy[state]
-    optimalvalue = np.zeros(n_states)
+    terms = terminals()
     
-    # TODO: implement code that tries all possible policies, calculate the values using def value_policy. Find the optimal values and the optimal policies to answer the exercise questions.
+    # here we consider all possible policies. But for terminal states we dont care about the policy, 
+    # so we just consider always the policy pi(s=terminalstate) = 0
+    possibleactions = [ list(range(n_actions)) if s not in terms else [0] for s in range(n_states)]
+    allpolicies = list(product(*possibleactions)) # allpolicies = [ele for ele in product(range(n_actions), repeat=n_states)]
+
+    # calculate value function for all possible policies and 
+    # select the one that has higher value function for all states
+    optimalvalue = np.zeros(n_states)
+    for policy in allpolicies:
+        value = value_policy(policy)        
+        if np.all( value >= optimalvalue ): # if value[0] > optimalvalue[0]:
+            optimalvalue = value
+            optimalpolicy = policy
+
+    optimalpolicies = [optimalpolicy]
 
     print ("Optimal value function:")
     print(optimalvalue)
@@ -91,8 +113,7 @@ def main():
     optimalpolicies = bruteforce_policies()
 
 
-    # This code can be used to "rollout" a policy in the environment:
-    """
+    # "rollout" a policy in the environment:
     print ("rollout policy:")
     maxiter = 100
     state = env.reset()
@@ -102,7 +123,7 @@ def main():
         state=new_state
         if done:
             print ("Finished episode")
-            break"""
+            break
 
 
 if __name__ == "__main__":
