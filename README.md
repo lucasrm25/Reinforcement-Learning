@@ -24,10 +24,19 @@ python3 -m pip install tensorflow --user
 
 ## Exercise 01 - k-arms Bandit
 
+Epsilon-greedy action selection for a bandit with k-arms.
+
+The Q action-value function is estimated by calculating the expected reward for each action. At each time step, the action that maximizes the Q value function is chosen with probability 1-epsilon (with probability epsilon a random action is chosen).
+
 ## Exercise 02 - Brute force value function
+
+In the frozen lake environment, the fixed-point value function is calculated using the Bellman equation for all possible policies. The optimal policy is chosen as the one with maximum value function for all states.
+
+This brute force approach (evaluating all possible policies) is however intractable for large state-action spaces.
 
 ## Exercise 03 - Dynamic Programming
 
+Implementation of the Value Iteration algorithm in the Frozen Lake environment
 
 ## Exercise 99 - Policy Search
 

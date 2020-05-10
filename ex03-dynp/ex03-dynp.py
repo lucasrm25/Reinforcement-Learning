@@ -16,12 +16,42 @@ n_states = env.observation_space.n
 n_actions = env.action_space.n
 
 
-def value_iteration():
-    V_states = np.zeros(n_states)  # init values as zero
+def value_iteration(maxiter=100):
+    ''' Calculate optimal policy using the Value iteration algorithm
+
+        NOTE: env.P[state][action] gives tuples (p, n_state, r, is_terminal), which tells the
+        probability p that we end up in the next state n_state and receive reward r -> p(s',r|s,a)
+    '''
+
+    V = np.zeros(n_states)  # init values as zero
     theta = 1e-8
     gamma = 0.8
-    # TODO: implement the value iteration algorithm and return the policy
-    # Hint: env.P[state][action] gives you tuples (p, n_state, r, is_terminal), which tell you the probability p that you end up in the next state n_state and receive reward r
+
+    # iterate value function until convergence
+    for _ in range(maxiter):
+
+        # value function for the next iteration
+        Vn = np.array([
+            np.max( [
+                    np.sum( [ p*(r+gamma*V[sn]) for p, sn, r, _ in env.P[s][a] ] )  # Bellman equation
+                    for a in range(n_actions)
+            ])
+            for s in range(n_states)
+        ])
+
+        if np.max(Vn-V) <= theta: break
+        else: V = Vn
+
+    # evaluate best policy (Bellman equation)
+    optPolicy = np.array([
+            np.argmax( [
+                    np.sum( [ p*(r+gamma*V[sn]) for p, sn, r, _ in env.P[s][a] ] )
+                    for a in range(n_actions)
+            ])
+            for s in range(n_states)
+        ])
+    
+    return optPolicy
 
 
 def main():
@@ -36,7 +66,7 @@ def main():
     print(policy)
 
     # This code can be used to "rollout" a policy in the environment:
-    """print ("rollout policy:")
+    print ("rollout policy:")
     maxiter = 100
     state = env.reset()
     for i in range(maxiter):
@@ -45,7 +75,7 @@ def main():
         state=new_state
         if done:
             print ("Finished episode")
-            break"""
+            break
 
 
 if __name__ == "__main__":
