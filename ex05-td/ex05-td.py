@@ -1,3 +1,7 @@
+''' Implementation of SARS and Q-Learning Algorithms to find optimal policy for the
+FrozenLake environment
+'''
+
 import gym
 import numpy as np
 from itertools import product
