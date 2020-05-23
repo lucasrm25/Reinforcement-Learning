@@ -38,6 +38,14 @@ This brute force approach (evaluating all possible policies) is however intracta
 
 Implementation of the Value Iteration algorithm in the Frozen Lake environment
 
+## Exercise 04 - Monte Carlo ES (exploring starts)
+
+Implementation of Monte Carlo ES to obtain the optimal policy and state-value function for blackjack.
+
+## Exercise 05 - Sarsa and Q-learning on the FrozenLake
+
+Implementation of the SARSA (on-policy) and Q-learning (off-policy) algorithms to solve the FrozenLake environment 
+
 ## Exercise 99 - Policy Search
 
 Reinforcement Learning (Policy search), Deep Learning (CNN and Transfer Learning), Image identification (YOLO) and Stochastic Optimization (Genetic algorithm) techniques were used to optimize the policy of the OpenGymAI Lunar-Lander-V2 Environment 

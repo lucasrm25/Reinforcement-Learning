@@ -19,8 +19,8 @@ n_actions = env.action_space.n
 def value_iteration(maxiter=100):
     ''' Calculate optimal policy using the Value iteration algorithm
 
-        NOTE: env.P[state][action] gives tuples (p, n_state, r, is_terminal), which tells the
-        probability p that we end up in the next state n_state and receive reward r -> p(s',r|s,a)
+        NOTE: env.P[state][action] gives tuples (p, ns, r, is_terminal), which tells the
+        probability p that we end up in the next state ns and receive reward r -> p(s',r|s,a)
     '''
 
     V = np.zeros(n_states)  # init values as zero
