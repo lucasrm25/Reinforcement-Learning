@@ -11,48 +11,74 @@ env = gym.make("FrozenLake-v0")
 #env = gym.make("FrozenLake-v0", desc=random_map)
 
 
-# Init some useful variables:
-n_states = env.observation_space.n
-n_actions = env.action_space.n
 
-
-def value_iteration(maxiter=100):
+def V_iteration(env, maxiter=1e3, gamma = 0.8, eps = 1e-8):
     ''' Calculate optimal policy using the Value iteration algorithm
 
         NOTE: env.P[state][action] gives tuples (p, ns, r, is_terminal), which tells the
         probability p that we end up in the next state ns and receive reward r -> p(s',r|s,a)
     '''
+    n_states = env.observation_space.n
+    n_actions =  env.action_space.n
 
     V = np.zeros(n_states)  # init values as zero
-    theta = 1e-8
-    gamma = 0.8
 
     # iterate value function until convergence
-    for _ in range(maxiter):
+    for _ in range(int(maxiter)):
 
         # value function for the next iteration
-        Vn = np.array([
+        V_ = np.array([
             np.max( [
-                    np.sum( [ p*(r+gamma*V[sn]) for p, sn, r, _ in env.P[s][a] ] )  # Bellman equation
-                    for a in range(n_actions)
+                np.sum( [ p*(r+gamma*V[s_]) for p, s_, r, _ in env.P[s][a] ] )  # Bellman equation
+                for a in range(n_actions)
             ])
             for s in range(n_states)
         ])
 
-        if np.max(Vn-V) <= theta: break
-        else: V = Vn
+        if np.max(V_-V) <= eps: 
+            break
+        else: 
+            V = V_
 
     # evaluate best policy (Bellman equation)
     optPolicy = np.array([
             np.argmax( [
-                    np.sum( [ p*(r+gamma*V[sn]) for p, sn, r, _ in env.P[s][a] ] )
+                    np.sum( [ p*(r+gamma*V[s_]) for p, s_, r, _ in env.P[s][a] ] )
                     for a in range(n_actions)
             ])
             for s in range(n_states)
         ])
     
-    return optPolicy
+    return V, optPolicy
 
+def Q_iteration(env, maxiter=1e3, gamma = 0.8, eps = 1e-8):
+    ''' Calculate optimal policy using the Q iteration algorithm
+
+        NOTE: env.P[state][action] gives tuples (p, ns, r, is_terminal), which tells the
+        probability p that we end up in the next state ns and receive reward r -> p(s',r|s,a)
+    '''
+    n_states = env.observation_space.n
+    n_actions =  env.action_space.n
+
+    Q = np.zeros((n_states,n_actions))  # init values as zero
+
+    # iterate value function until convergence
+    for _ in range(int(maxiter)):
+
+        # value function for the next iteration
+        Q_ = np.array([
+            [
+                np.sum( [ p*(r+gamma*np.max(Q[s_,:])) for p, s_, r, _ in env.P[s][a] ] )  # Bellman equation
+                for a in range(n_actions)
+            ]
+            for s in range(n_states)
+        ])
+
+        if np.max(Q_-Q) <= eps: 
+            break
+        else: 
+            Q = Q_
+    return Q
 
 def main():
     # print the environment
@@ -61,7 +87,7 @@ def main():
     print("")
 
     # run the value iteration
-    policy = value_iteration()
+    V, policy = V_iteration(env)
     print("Computed policy:")
     print(policy)
 
