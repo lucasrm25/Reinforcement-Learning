@@ -113,15 +113,15 @@ def sarsa(env, alpha=0.1, gamma=0.9, epsilon=0.1, epsilon_decay = 0.999, num_ep=
 
     # Initialize arbitrarily Q(s; a)
     Q = np.random.random((n_states,  n_actions))
-    # terminal states must be initialized to zero
+    # terminal states must be initialized with zero
     Q[terminals(env),:] = 0
 
-    # This is some starting point performing random walks in the environment:
     for i in range(num_ep):
         if not i%100: print(f'iter:{i}') 
 
-        # init state and first epsilon-greedy policy
+        # init state
         s = env.reset()
+        # choose action from behaviour policy: epsilon-greedy
         a = np.argmax( Q[s,:] ) if np.random.binomial(1,1-epsilon) == 1 else np.random.randint(n_actions)
         
         done = False
@@ -130,11 +130,11 @@ def sarsa(env, alpha=0.1, gamma=0.9, epsilon=0.1, epsilon_decay = 0.999, num_ep=
             # take action a from behaviour policy, observe R, S'
             s_, r, done, _ = env.step(a)
             
-            # behaviour policy == target policy == epsilon-greedy
+            # behaviour policy: epsilon-greedy
             a_ = np.argmax( Q[s_,:] ) if np.random.binomial(1,1-epsilon) == 1 else np.random.randint(n_actions)
             
             # evaluate policy - update Q-value function
-            # target policy: epsilon-greedy
+            # target policy a_ == behaviour policy: epsilon-greedy
             Q[s,a] += alpha * ( r + gamma * Q[s_,a_] - Q[s,a] )
             
             # update state and action
@@ -156,17 +156,16 @@ def qlearning(env, alpha=0.1, gamma=0.9, epsilon=0.1, epsilon_decay = 0.999, num
     # terminal states must be initialized to zero
     Q[terminals(env),:] = 0
 
-    # This is some starting point performing random walks in the environment:
     for i in range(num_ep):
         if not i%100: print(f'iter:{i}') 
 
-        # init state and first epsilon-greedy policy
+        # init state
         s = env.reset()
         
         done = False
         while not done:
             
-            # behaviour policy: epsilon-greedy
+            # choose action from behaviour policy: epsilon-greedy
             a = np.argmax( Q[s,:] ) if np.random.binomial(1,epsilon) == 0 else np.random.randint(n_actions)
 
             # take action a from behaviour policy, observe R, S'
