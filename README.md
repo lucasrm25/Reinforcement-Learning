@@ -42,9 +42,17 @@ Implementation of the Value Iteration algorithm in the Frozen Lake environment
 
 Implementation of Monte Carlo ES to obtain the optimal policy and state-value function for blackjack.
 
-## Exercise 05 - Sarsa and Q-learning on the FrozenLake
+## Exercise 05 -TD learning - Sarsa and Q-learning
 
 Implementation of the SARSA (on-policy) and Q-learning (off-policy) algorithms to solve the FrozenLake environment 
+
+## Exercise 06 - n-Step TD learning
+
+Implementation of n-step SARSA to solve the 8x8 Frozen lake environment
+
+## Exercise 07 - Function approximations and Eligibility traces
+
+Implementation of Q(λ) and SARSA(λ) with state-aggregation to solve the Mountain Car environment
 
 ## Exercise 99 - Policy Search
 
